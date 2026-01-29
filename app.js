@@ -2,6 +2,7 @@
 let subjects = JSON.parse(localStorage.getItem('attendance_subjects')) || [];
 let settings = JSON.parse(localStorage.getItem('attendance_settings')) || { target: 75 };
 let historyLog = JSON.parse(localStorage.getItem('attendance_history')) || [];
+let isReorderMode = false; // New state
 
 // DOM Elements
 const subjectsList = document.getElementById('subjectsList');
@@ -11,6 +12,7 @@ const settingsBtn = document.getElementById('settingsBtn');
 const addModal = document.getElementById('addModal');
 const settingsModal = document.getElementById('settingsModal');
 const editModal = document.getElementById('editModal'); // New
+const reorderBtn = document.getElementById('reorderBtn'); // New
 
 // Init
 function init() {
@@ -68,6 +70,11 @@ function setupEventListeners() {
     document.getElementById('saveSettings').addEventListener('click', handleSaveSettings);
     document.getElementById('cancelEdit').addEventListener('click', () => editModal.classList.add('hidden')); // New
     document.getElementById('saveEdit').addEventListener('click', handleSaveEdit); // New
+    reorderBtn.addEventListener('click', () => {
+        isReorderMode = !isReorderMode;
+        reorderBtn.classList.toggle('active', isReorderMode);
+        render();
+    });
 
     // Outside click
     addModal.addEventListener('click', e => { if (e.target === addModal) addModal.classList.add('hidden'); });
@@ -182,6 +189,19 @@ function handleUpdateAttendance(id, type) {
     saveData();
 }
 
+window.app_move = (id, direction) => {
+    const index = subjects.findIndex(s => s.id === id);
+    if (index === -1) return;
+
+    if (direction === 'up' && index > 0) {
+        [subjects[index], subjects[index - 1]] = [subjects[index - 1], subjects[index]];
+    } else if (direction === 'down' && index < subjects.length - 1) {
+        [subjects[index], subjects[index + 1]] = [subjects[index + 1], subjects[index]];
+    }
+
+    saveData();
+};
+
 function calculateNeeded(present, total, target) {
     const current = total === 0 ? 0 : (present / total) * 100;
     if (current >= target) return { status: 'good', msg: 'You are on track!' };
@@ -212,10 +232,26 @@ function render() {
         const isGood = pct >= settings.target;
 
         const card = document.createElement('div');
-        card.className = 'subject-card';
+        card.className = `subject-card ${isReorderMode ? 'reorder-active' : ''}`;
         card.innerHTML = `
             <div class="subject-header">
-                <span class="subject-name">${sub.name}</span>
+                <div class="header-left">
+                    ${isReorderMode ? `
+                        <div class="reorder-controls">
+                            <button class="move-btn" onclick="app_move(${sub.id}, 'up')" ${subjects.indexOf(sub) === 0 ? 'disabled' : ''}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                </svg>
+                            </button>
+                            <button class="move-btn" onclick="app_move(${sub.id}, 'down')" ${subjects.indexOf(sub) === subjects.length - 1 ? 'disabled' : ''}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    ` : ''}
+                    <span class="subject-name">${sub.name}</span>
+                </div>
                 <div class="header-actions">
                      <button class="edit-btn" onclick="app_edit(${sub.id})">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -240,7 +276,7 @@ function render() {
                 </div>
                 <div class="attendance-message ${calc.status === 'good' ? 'status-good' : 'status-bad'}">${calc.msg}</div>
             </div>
-            <div class="actions-row">
+            <div class="actions-row ${isReorderMode ? 'hidden' : ''}">
                 <button class="action-btn btn-present" onclick="app_present(${sub.id})">Present</button>
                 <button class="action-btn btn-absent" onclick="app_absent(${sub.id})">Absent</button>
             </div>

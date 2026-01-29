@@ -61,6 +61,11 @@ h1 {
     letter-spacing: -0.5px;
 }
 
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
 /* Icon Button */
 .icon-btn {
     background: rgba(255, 255, 255, 0.1);
@@ -78,6 +83,11 @@ h1 {
 
 .icon-btn:active {
     transform: scale(0.92);
+}
+
+.icon-btn.active {
+    background: var(--accent);
+    box-shadow: 0 0 15px rgba(10, 132, 255, 0.4);
 }
 
 /* Glass Cards */
@@ -161,6 +171,55 @@ h1 {
 .subject-name {
     font-size: 18px;
     font-weight: 600;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reorder-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.move-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: var(--text-primary);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.move-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.move-btn:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.reorder-active {
+    border: 1px dashed var(--accent);
+    animation: wiggle 0.3s infinite ease-in-out alternate;
+}
+
+@keyframes wiggle {
+    from {
+        transform: rotate(-0.5deg);
+    }
+
+    to {
+        transform: rotate(0.5deg);
+    }
 }
 
 .delete-btn {
