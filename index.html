@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Attendance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <h1>My Attendance</h1>
+                <div class="header-actions">
+                    <button id="reorderBtn" class="icon-btn" title="Reorder Subjects">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M7 15l5 5 5-5M7 9l5-5 5 5" />
+                        </svg>
+                    </button>
+                    <button id="settingsBtn" class="icon-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="summary-card glass">
+                <div class="summary-item">
+                    <span class="label">Average</span>
+                    <span class="value" id="overallAvg">0%</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Target</span>
+                    <span class="value" id="targetDisplay">75%</span>
+                </div>
+            </div>
+        </header>
+
+        <main id="subjectsList" class="subjects-list active-view">
+            <!-- Subjects will be injected here -->
+            <p style="text-align: center; color: var(--text-secondary); margin-top: 40px;">No subjects yet. Tap + to add
+                one.</p>
+        </main>
+
+        <section id="historyView" class="history-list hidden-view">
+            <!-- History items will be injected here -->
+        </section>
+
+        <!-- Bottom Navigation (Liquid Bar) -->
+        <nav class="bottom-nav glass">
+            <div class="nav-indicator" id="navIndicator"></div>
+
+            <button class="nav-item active" id="navHome" onclick="switchTab('home')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+            </button>
+
+            <button class="nav-item center-btn" id="addSubjectBtn">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+            </button>
+
+            <button class="nav-item" id="navHistory" onclick="switchTab('history')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </button>
+        </nav>
+        <div id="version-tag"
+            style="position: fixed; bottom: 85px; right: 20px; font-size: 10px; color: rgba(255,255,255,0.3); pointer-events: none;">
+            v6.0</div>
+    </div>
+
+    <!-- Modals -->
+    <div id="addModal" class="modal hidden">
+        <div class="modal-content glass">
+            <h2>Add Subject</h2>
+            <input type="text" id="subjectNameInput" placeholder="Subject Name (e.g. Physics)" autofocus>
+            <div class="modal-actions">
+                <button id="cancelAdd" class="btn secondary">Cancel</button>
+                <button id="confirmAdd" class="btn primary">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content glass">
+            <h2>Settings</h2>
+            <div class="input-group">
+                <label>Attendance Target (%)</label>
+                <input type="number" id="targetInput" value="75" min="1" max="100">
+            </div>
+            <div class="modal-actions">
+                <button id="cancelSettings" class="btn secondary">Cancel</button>
+                <button id="saveSettings" class="btn primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content glass">
+            <h2>Edit Subject</h2>
+            <input type="hidden" id="editSubjectId">
+            <div class="input-group">
+                <label>Subject Name</label>
+                <input type="text" id="editSubjectName">
+            </div>
+            <div class="input-group">
+                <label>Present Classes</label>
+                <input type="number" id="editPresent" min="0">
+            </div>
+            <div class="input-group">
+                <label>Total Classes</label>
+                <input type="number" id="editTotal" min="0">
+            </div>
+            <div class="modal-actions">
+                <button id="cancelEdit" class="btn secondary">Cancel</button>
+                <button id="saveEdit" class="btn primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
